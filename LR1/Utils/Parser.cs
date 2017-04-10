@@ -34,11 +34,11 @@ namespace LR1.Utils
             bool[] folosit = new bool[this.gram.reguli_productie.Count];
 
             //executing method
-            Helpers.getFirst(configuratie,
+            /*Helpers.getFirst(configuratie,
                 folosit,
                 terminale,
                 this.gram);
-
+            */
             //scoatem duplicatele
             return terminale.Distinct().ToList();
         }

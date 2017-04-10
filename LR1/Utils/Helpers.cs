@@ -8,62 +8,74 @@ namespace LR1.Utils
 {
     public class Helpers
     {
-        //will return true if we found a lambda production accross
-        public static bool getFirst(string text,
-            //List<Regula> reguliFirst,
-             bool[] folosit,
-             List<string> terminale,
-             GIC gram
-            )
+
+        public static List<ElementFirst> getFirstsForGIC(GIC gic)
         {
-            if (String.IsNullOrEmpty(text)) return true;
-           
-            string item = text[0].ToString();
-            //daca primul este un terminal
-            if (gram.terminale.Any(x => x == (item.ToString())))
+            //initializare variabile
+            List<ElementFirst> rezultat = new List<ElementFirst>();
+
+            //adaugare rezultate pt terminale
+            foreach(string term in gic.terminale)
             {
-                //terminale.Add(r.productie[0].ToString());
-                terminale.Add(item);
-                return false;
+                rezultat.Add(new ElementFirst(term, new List<string> { term }));
+            }
+            //adaugare rezultate pt neterminale
+            foreach (string neterm in gic.neterminale)
+            {
+                rezultat.Add(new ElementFirst(neterm, new List<string>()));
             }
 
-            List<Regula> newRules = gram.reguli_productie.Where(x => x.neterminal == item).ToList();
-            bool gotLambda = false;
-            for(int i=0;i<newRules.Count;i++)
+            //adaugam rez pt lambda
+            rezultat.Add(new ElementFirst(Constants.Lambda, new List<string> { Constants.Lambda }));
+
+            bool actualizare = true;
+
+            //cat timp inca actualizam matricea
+            while(actualizare)
             {
-                if (newRules[i].productie == Constants.Lambda)
+
+                actualizare = false;
+                foreach (Regula r in gic.reguli_productie)
                 {
-                    bool foundLambda = getFirst(text.Substring(1), //ne uitam aici in continuare pentru first
-                                                //reguliFirst,
-                           folosit,
-                           terminale,
-                           gram);
-                    if (foundLambda) gotLambda = true;
+
                 }
 
-                if (!folosit[newRules[i].parserIndex])
+            }
+
+            return rezultat;
+        }
+
+        public static void getFirstsForString(string ip,
+                                         List<ElementFirst> rezPrecedente,
+                                         ElementFirst rezPartial)
+        {
+            if (String.IsNullOrEmpty(ip)) return;
+
+            bool containsLambda = rezPartial.rezultat.Any(x => x == Constants.Lambda);
+            bool isEmpty = rezPartial.rezultat.Count == 0;
+
+            if(!isEmpty && !containsLambda)
+            {
+                //we found all possible solutions for First(1)
+                return;
+            }
+            if(isEmpty || containsLambda)
+            {
+                //we can still add new elements to this solution
+                string currentElement = ip.Substring(0, 1);
+                ElementFirst rezultatCurent = rezPrecedente.Where(x => x.x_string == currentElement).FirstOrDefault();
+                if(rezultatCurent != null && rezultatCurent.rezultat.Count > 0)
                 {
-                    folosit[newRules[i].parserIndex] = true;
-                    if (newRules[i].productie != Constants.Lambda)
-                    {
-                        getFirst(newRules[i].productie, //ne uitam aici in continuare pentru first
-                            //reguliFirst,
-                            folosit,
-                            terminale,
-                            gram);
-                    }
-                    else
-                    {
-                        getFirst(text.Substring(1), //ne uitam aici in continuare pentru first
-                            //reguliFirst,
-                            folosit,
-                            terminale,
-                            gram);
-                    }
+                    //removing lambda
+                    rezPartial.rezultat.Remove(Constants.Lambda);
+                    //adding mewly found results
+                    rezPartial.rezultat.AddRange(rezultatCurent.rezultat);
+
+                    //getting the values for the next element
+                    getFirstsForString(ip.Substring(1), rezPrecedente, rezPartial);
+
                 }
             }
-            return;
-
         }
     }
 }
