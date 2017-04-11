@@ -37,7 +37,22 @@ namespace LR1.Utils
                 actualizare = false;
                 foreach (Regula r in gic.reguli_productie)
                 {
+                    ElementFirst first_neterminal_curent = rezultat.Where(x => x.x_string == r.neterminal).FirstOrDefault();
+                    if(first_neterminal_curent != null)
+                    {
+                        ElementFirst newResults = new ElementFirst(r.neterminal,new List<string>());
+                        getFirstsForString(r.productie, rezultat, newResults);
+                        first_neterminal_curent.rezultat.Distinct();
 
+
+                        //we check if we added any new values
+
+                        bool anythingNew = newResults.rezultat.Except(first_neterminal_curent.rezultat).Any();
+                        if (anythingNew) actualizare = true;
+                        first_neterminal_curent.rezultat.AddRange(newResults.rezultat);
+                        first_neterminal_curent.rezultat = first_neterminal_curent.rezultat.Distinct().ToList(); ;
+
+                    }
                 }
 
             }

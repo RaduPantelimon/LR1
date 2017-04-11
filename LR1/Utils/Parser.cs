@@ -9,6 +9,7 @@ namespace LR1.Utils
     public class Parser
     {
         GIC gram;
+        public List<ElementFirst> configuratii_first;
 
         public Parser(GIC _gram) {
             gram = _gram;
@@ -18,6 +19,8 @@ namespace LR1.Utils
             {
                 gram.reguli_productie[i].parserIndex = i;
             }
+            configuratii_first = Helpers.getFirstsForGIC(_gram);
+
         }
 
         public MultimeConfiguratii closure(MultimeConfiguratii J)
@@ -26,22 +29,17 @@ namespace LR1.Utils
             return J;
         }
 
-        //primeste un sir apartinand (Vt reunit Vn)* , intoarce first de el
-        public List<string> First(string configuratie)
+        public List<string> getFirst(string ip)
         {
-            //initializing variables
-            List<string> terminale = new List<String>();
-            bool[] folosit = new bool[this.gram.reguli_productie.Count];
+            ElementFirst newElem = new ElementFirst(ip, new List<string>());
 
-            //executing method
-            /*Helpers.getFirst(configuratie,
-                folosit,
-                terminale,
-                this.gram);
-            */
-            //scoatem duplicatele
-            return terminale.Distinct().ToList();
+            Helpers.getFirstsForString(ip,configuratii_first,newElem);
+
+            return newElem.rezultat;
         }
+
+        //primeste un sir apartinand (Vt reunit Vn)* , intoarce first de el
+        
 
 
     }

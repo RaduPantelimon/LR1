@@ -217,7 +217,7 @@ public class LRParser
 
         Console.WriteLine(sw.ElapsedMilliseconds);
 
-        List<string> firstA = lr1Parser.First("A");
+        List<string> firstA = lr1Parser.getFirst("A");
     }
 }
 
